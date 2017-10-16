@@ -42,8 +42,29 @@ public class DrumButtonEventHandler : MonoBehaviour,
         Debug.Log("OnButtonPressed: " + vb.VirtualButtonName);
 
         SetButtonMaterial(m_ButtonMaterialPressed);
+        Debug.Log(vb.name);
 
-        GetComponent<AudioSource>().Play();
+        float pitch = GetComponent<AudioSource>().pitch;
+
+        switch (vb.VirtualButtonName)
+        {
+            case "drum":
+                GetComponent<AudioSource>().Play();
+                break;
+
+            case "pitchUp":
+                pitch += 0.1f;
+                GetComponentInChildren<TextMesh>().text = pitch.ToString();
+                GetComponent<AudioSource>().pitch = pitch;
+                break;
+
+            case "pitchDown":
+                pitch -= 0.1f;
+                GetComponentInChildren<TextMesh>().text = pitch.ToString();
+                GetComponent<AudioSource>().pitch = pitch;
+                break;
+
+        }
     }
 
     /// <summary>
