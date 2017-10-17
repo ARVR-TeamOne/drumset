@@ -55,13 +55,13 @@ public class DrumButtonEventHandler : MonoBehaviour,
 
             case "pitchUp":
                 pitch += 0.1f;
-                GetComponentInChildren<TextMesh>().text = pitch.ToString();
+                GetComponentInChildren<TextMesh>().text = Mathf.Ceil(pitch).ToString();
                 audio.pitch = pitch;
                 break;
 
             case "pitchDown":
                 pitch -= 0.1f;
-                GetComponentInChildren<TextMesh>().text = pitch.ToString();
+                GetComponentInChildren<TextMesh>().text = Mathf.Ceil(pitch).ToString();
                 audio.pitch = pitch;
                 break;
 
