@@ -12,6 +12,10 @@ public class DrumButtonEventHandler : MonoBehaviour,
     #region PUBLIC_MEMBERS
     public Material m_ButtonMaterial;
     public Material m_ButtonMaterialPressed;
+
+    GameObject virtualButtonPitchUp;
+    GameObject virtualButtonPitchDown;
+    GameObject virtualButtonRecord;
     #endregion // PUBLIC_MEMBERS
 
     #region PRIVATE_MEMBERS
@@ -55,18 +59,22 @@ public class DrumButtonEventHandler : MonoBehaviour,
 
             case "pitchUp":
                 pitch += 0.1f;
-                GetComponentInChildren<TextMesh>().text = Mathf.Ceil(pitch).ToString();
+                GetComponentInChildren<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
                 audio.pitch = pitch;
                 break;
 
             case "pitchDown":
                 pitch -= 0.1f;
-                GetComponentInChildren<TextMesh>().text = Mathf.Ceil(pitch).ToString();
+                GetComponentInChildren<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
                 audio.pitch = pitch;
                 break;
 
             case "record":
                 audio.clip = Microphone.Start("Built-in Microphone", false, 2, 44100);
+                break;
+
+            case "option":
+
                 break;
 
         }
