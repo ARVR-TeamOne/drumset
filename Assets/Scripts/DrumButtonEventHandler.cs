@@ -89,7 +89,7 @@ public class DrumButtonEventHandler : MonoBehaviour,
                     foreach (TrackableBehaviour tb in stateManager.GetTrackableBehaviours())
                     {
 
-                        stateManager.DestroyTrackableBehavioursForTrackable(tb.Trackable);
+                        //stateManager.
                     }
 
                         ImageTargetBehaviour.CreateVirtualButton("pitchDown", new Vector2(0.02f, 0.015f), gameObject);
