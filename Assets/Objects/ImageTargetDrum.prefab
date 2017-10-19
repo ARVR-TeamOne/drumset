@@ -674,9 +674,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03d9cb46c82384949bcf024bcd9b6770, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_ButtonMaterial: {fileID: 2100000, guid: 9c7f6c407867c45e48e2a70b7db2fd02, type: 2}
-  m_ButtonMaterialPressed: {fileID: 2100000, guid: 3d03b899691544252b8aa5445b1071ee,
-    type: 2}
+  VirtualButtonPitchUp: {fileID: 0}
+  VirtualButtonPitchDown: {fileID: 0}
+  VirtualButtonRecord: {fileID: 0}
 --- !u!114 &114980112155532282
 MonoBehaviour:
   m_ObjectHideFlags: 1
