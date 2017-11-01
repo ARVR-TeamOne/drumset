@@ -56,6 +56,7 @@
      <Compile Include="Assets\SamplesResources\UserDefinedTargets\Scripts\Editor\UDTEventHandlerEditor.cs" />
      <Compile Include="Assets\SamplesResources\VuforiaSamplesUI\Scripts\Editor\OptionsConfigEditor.cs" />
      <Compile Include="Assets\Vuforia\Editor\Scripts\OpenSourceInitializer.cs" />
+     <None Include="Assets\StreamingAssets\Vuforia\Drummar.xml" />
      <None Include="Assets\Vuforia\Shaders\ColoredLines.shader" />
      <None Include="Assets\SamplesResources\VirtualButtons\Shaders\Gradient.shader" />
      <None Include="Assets\SamplesResources\CloudReco\Shaders\CR_Custom_TransparentUnlit.shader" />

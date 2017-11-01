@@ -12,9 +12,7 @@ public class DrumButtonEventHandler : MonoBehaviour,
 {
     #region PUBLIC_MEMBERS
 
-    public GameObject VirtualButtonPitchUp;
-    public GameObject VirtualButtonPitchDown;
-    public GameObject VirtualButtonRecord;
+    public GameObject FrontPageObject;
     #endregion // PUBLIC_MEMBERS
 
     #region PRIVATE_MEMBERS
@@ -25,6 +23,7 @@ public class DrumButtonEventHandler : MonoBehaviour,
     #region MONOBEHAVIOUR_METHODS
     void Start()
     {
+
         // Register with the virtual buttons TrackableBehaviour
         virtualButtonBehaviours = GetComponentsInChildren<VirtualButtonBehaviour>();
 
@@ -48,26 +47,48 @@ public class DrumButtonEventHandler : MonoBehaviour,
         SetButtonMaterial(0.5f, vb);
         Debug.Log(vb.name);
 
-        float pitch = GetComponent<AudioSource>().pitch;
-        AudioSource audio = GetComponent<AudioSource>();
+        float pitch = 0;
+        float volume = 0;
+        AudioSource audio = null;
+
+        if(FrontPageObject != null)
+        {
+            pitch = GetComponent<AudioSource>().pitch;
+            volume = GetComponent<AudioSource>().volume;
+            audio = GetComponent<AudioSource>();
+        }
 
         switch (vb.VirtualButtonName)
         {
-            case "drum":
+            case "drum1":
+            case "drum2":
                 audio.Play();
-                //GameObject.Find("DrumModel").GetComponent<Animator>().;
+                Animation anim = gameObject.GetComponentInChildren<Animation>();
+                anim.Play("drumAnim");
                 break;
 
             case "pitchUp":
                 pitch += 0.1f;
-                GameObject.Find("InfoTextDrum").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
+                GameObject.Find("InfoTextPitch").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
                 audio.pitch = pitch;
                 break;
 
             case "pitchDown":
                 pitch -= 0.1f;
-                GameObject.Find("InfoTextDrum").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
+                GameObject.Find("InfoTextPitch").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
                 audio.pitch = pitch;
+                break;
+                
+            case "volumeUp":
+                pitch += 0.1f;
+                GameObject.Find("InfoTextVolume").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
+                audio.volume = volume;
+                break;
+
+            case "volumeDown":
+                pitch -= 0.1f;
+                GameObject.Find("InfoTextVolume").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
+                audio.volume = volume;
                 break;
 
             case "record":

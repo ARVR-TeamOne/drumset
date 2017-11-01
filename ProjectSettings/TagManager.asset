@@ -7,6 +7,8 @@ TagManager:
   - InfoText
   - DrumModel
   - OptionButtonDrum
+  - StartMenu
+  - DrumOne
   layers:
   - Default
   - TransparentFX
