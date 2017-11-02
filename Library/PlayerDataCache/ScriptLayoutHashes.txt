@@ -181,7 +181,7 @@ a9e1c36c671666e79706791e556d5100 Vuforia.UnityExtensions.dll:Vuforia.VuMarkBehav
 05524b8f659e7bfe5756d1335fec24ba Vuforia.UnityExtensions.dll:Vuforia.WireframeTrackableEventHandler
 15bea26698002c6c4a3087131232ce5c Vuforia.UnityExtensions.dll:Vuforia.WordBehaviour
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.ScanLine
-9b6165566f0e8cf1fb5abe22b58f79d5 Assembly-CSharp.dll:.DrumButtonEventHandler
+ef6df69f0d6cffad58e5884112e4f23a Assembly-CSharp.dll:.DrumButtonEventHandler
 af81a921b7f8543a1aaa2a5cb365859a Assembly-CSharp.dll:.DrillController
 a73dc3285fd5b06d04dff7acd30688f5 Assembly-CSharp.dll:.CloudRecoEventHandler
 9a87a9a12cf953f3e9ef199c87453ed5 Assembly-CSharp.dll:.OptionsConfig

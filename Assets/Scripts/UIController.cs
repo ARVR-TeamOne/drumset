@@ -11,7 +11,10 @@ public class UIController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+        if (Time.time > 3)
+        {
+            DestroyStartMenu();
+        }
 	}
 
     public void DestroyStartMenu()

@@ -24,7 +24,10 @@ public class DrumButtonEventHandler : MonoBehaviour,
     #region MONOBEHAVIOUR_METHODS
     void Start()
     {
-        menuSound = MenuSoundObject.GetComponent<AudioSource>();
+        if(MenuSoundObject != null)
+        {
+            menuSound = MenuSoundObject.GetComponent<AudioSource>();
+        }
 
         // Register with the virtual buttons TrackableBehaviour
         virtualButtonBehaviours = GetComponentsInChildren<VirtualButtonBehaviour>();
