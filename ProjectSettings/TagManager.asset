@@ -9,6 +9,8 @@ TagManager:
   - OptionButtonDrum
   - StartMenu
   - DrumOne
+  - PitchInfoText
+  - VolumeInfoText
   layers:
   - Default
   - TransparentFX

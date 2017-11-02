@@ -49,14 +49,17 @@ public class DrumButtonEventHandler : MonoBehaviour,
 
         float pitch = 0;
         float volume = 0;
-        AudioSource audio = null;
 
-        if(FrontPageObject != null)
+        AudioSource audio = GetComponent<AudioSource>();
+
+        //get audio source settings from front page object
+        if (FrontPageObject != null)
         {
-            pitch = GetComponent<AudioSource>().pitch;
-            volume = GetComponent<AudioSource>().volume;
-            audio = GetComponent<AudioSource>();
+            audio = FrontPageObject.GetComponent<AudioSource>();
+            pitch = FrontPageObject.GetComponent<AudioSource>().pitch;
+            volume = FrontPageObject.GetComponent<AudioSource>().volume;
         }
+
 
         switch (vb.VirtualButtonName)
         {
@@ -69,25 +72,25 @@ public class DrumButtonEventHandler : MonoBehaviour,
 
             case "pitchUp":
                 pitch += 0.1f;
-                GameObject.Find("InfoTextPitch").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
+                GetChildObject(gameObject.transform, "PitchInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
                 audio.pitch = pitch;
                 break;
 
             case "pitchDown":
                 pitch -= 0.1f;
-                GameObject.Find("InfoTextPitch").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
+                GetChildObject(gameObject.transform, "PitchInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
                 audio.pitch = pitch;
                 break;
                 
             case "volumeUp":
-                pitch += 0.1f;
-                GameObject.Find("InfoTextVolume").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
+                volume += 0.1f;
+                GetChildObject(gameObject.transform, "VolumeInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
                 audio.volume = volume;
                 break;
 
             case "volumeDown":
-                pitch -= 0.1f;
-                GameObject.Find("InfoTextVolume").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
+                volume -= 0.1f;
+                GetChildObject(gameObject.transform, "VolumeInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
                 audio.volume = volume;
                 break;
 
@@ -158,6 +161,21 @@ public class DrumButtonEventHandler : MonoBehaviour,
             Color color = vb.GetComponent<MeshRenderer>().material.color;
             vb.GetComponent<MeshRenderer>().material.color = new Color(color.r, color.g, color.b, transparency);
         }
+    }
+
+    public GameObject GetChildObject(Transform parent, string _tag)
+    {
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform child = parent.GetChild(i);
+            if (child.tag == _tag)
+            {
+                return child.gameObject;
+            }
+        }
+
+        return null;
     }
     #endregion // PRIVATE METHODS
 }
