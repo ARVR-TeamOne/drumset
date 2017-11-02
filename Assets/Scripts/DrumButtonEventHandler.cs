@@ -11,18 +11,20 @@ public class DrumButtonEventHandler : MonoBehaviour,
                                          IVirtualButtonEventHandler
 {
     #region PUBLIC_MEMBERS
-
+    public GameObject MenuSoundObject;
     public GameObject FrontPageObject;
     #endregion // PUBLIC_MEMBERS
 
     #region PRIVATE_MEMBERS
     VirtualButtonBehaviour[] virtualButtonBehaviours;
+    AudioSource menuSound;
     bool optionsShownFlag = false;
     #endregion // PRIVATE_MEMBERS
 
     #region MONOBEHAVIOUR_METHODS
     void Start()
     {
+        menuSound = MenuSoundObject.GetComponent<AudioSource>();
 
         // Register with the virtual buttons TrackableBehaviour
         virtualButtonBehaviours = GetComponentsInChildren<VirtualButtonBehaviour>();
@@ -74,24 +76,28 @@ public class DrumButtonEventHandler : MonoBehaviour,
                 pitch += 0.1f;
                 GetChildObject(gameObject.transform, "PitchInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
                 audio.pitch = pitch;
+                menuSound.Play();
                 break;
 
             case "pitchDown":
                 pitch -= 0.1f;
                 GetChildObject(gameObject.transform, "PitchInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
                 audio.pitch = pitch;
+                menuSound.Play();
                 break;
                 
             case "volumeUp":
                 volume += 0.1f;
                 GetChildObject(gameObject.transform, "VolumeInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
                 audio.volume = volume;
+                menuSound.Play();
                 break;
 
             case "volumeDown":
                 volume -= 0.1f;
                 GetChildObject(gameObject.transform, "VolumeInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
                 audio.volume = volume;
+                menuSound.Play();
                 break;
 
             case "record":
