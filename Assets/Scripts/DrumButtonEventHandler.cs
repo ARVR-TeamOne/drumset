@@ -19,11 +19,14 @@ public class DrumButtonEventHandler : MonoBehaviour,
     VirtualButtonBehaviour[] virtualButtonBehaviours;
     AudioSource menuSound;
     bool optionsShownFlag = false;
+    RecorderScript recorder;
     #endregion // PRIVATE_MEMBERS
 
     #region MONOBEHAVIOUR_METHODS
     void Start()
     {
+        recorder = GameObject.FindGameObjectWithTag("Recorder").GetComponent<RecorderScript>();
+
         if(MenuSoundObject != null)
         {
             menuSound = MenuSoundObject.GetComponent<AudioSource>();
@@ -73,6 +76,7 @@ public class DrumButtonEventHandler : MonoBehaviour,
                 audio.Play();
                 Animation anim = gameObject.GetComponentInChildren<Animation>();
                 anim.Play("drumAnim");
+                recorder.saveSound(gameObject);
                 break;
 
             case "pitchUp":
