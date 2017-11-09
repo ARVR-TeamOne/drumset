@@ -80,6 +80,7 @@ public class DrumButtonEventHandler : MonoBehaviour,
                 break;
 
             case "pitchUp":
+                Debug.Log("WULULU");
                 pitch += 0.1f;
                 GetChildObject(gameObject.transform, "PitchInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
                 audio.pitch = pitch;
