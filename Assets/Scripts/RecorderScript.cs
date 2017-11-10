@@ -64,7 +64,7 @@ public class RecorderScript : MonoBehaviour, IVirtualButtonEventHandler
 
         switch (vb.VirtualButtonName)
         {
-            case "play":
+            case "playLoop":
                 playLoop();
                 break;
 

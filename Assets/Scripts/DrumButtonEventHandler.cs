@@ -51,9 +51,14 @@ public class DrumButtonEventHandler : MonoBehaviour,
     public void OnButtonPressed(VirtualButtonBehaviour vb)
     {
         Debug.Log("OnButtonPressed: " + vb.VirtualButtonName);
+        /*
+        Debug.Log(this);
+        Debug.Log(gameObject);
+        Debug.Log(vb.gameObject);
+        Debug.Log(vb.name);
+        */
 
         SetButtonMaterial(0.5f, vb);
-        Debug.Log(vb.name);
 
         float pitch = 0;
         float volume = 0;
@@ -69,10 +74,10 @@ public class DrumButtonEventHandler : MonoBehaviour,
         }
 
 
-        switch (vb.VirtualButtonName)
+        switch (vb.VirtualButtonName.Remove(vb.VirtualButtonName.Length-1, 1))
         {
-            case "drum1":
-            case "drum2":
+            case "drumLeft":
+            case "drumRight":
                 audio.Play();
                 Animation anim = gameObject.GetComponentInChildren<Animation>();
                 anim.Play("drumAnim");
@@ -88,6 +93,7 @@ public class DrumButtonEventHandler : MonoBehaviour,
                 break;
 
             case "pitchDown":
+            case "pitchDown1":
                 pitch -= 0.1f;
                 GetChildObject(gameObject.transform, "PitchInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
                 audio.pitch = pitch;
