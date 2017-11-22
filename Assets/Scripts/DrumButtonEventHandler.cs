@@ -71,92 +71,92 @@ public class DrumButtonEventHandler : MonoBehaviour,
             audio = FrontPageObject.GetComponent<AudioSource>();
             pitch = FrontPageObject.GetComponent<AudioSource>().pitch;
             volume = FrontPageObject.GetComponent<AudioSource>().volume;
-        }
 
+            Debug.Log(vb.VirtualButtonName.Remove(vb.VirtualButtonName.Length - 2, 2));
 
-        switch (vb.VirtualButtonName.Remove(vb.VirtualButtonName.Length-1, 1))
-        {
-            case "drumLeft":
-            case "drumRight":
-                audio.Play();
-                Animation anim = gameObject.GetComponentInChildren<Animation>();
-                anim.Play("drumAnim");
-                recorder.saveSound(gameObject);
-                break;
+            switch (vb.VirtualButtonName.Remove(vb.VirtualButtonName.Length - 1, 1))
+            {
+                case "pitchUp":
+                    Debug.Log("WULULU");
+                    pitch += 0.1f;
+                    GetChildObject(gameObject.transform, "PitchInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
+                    audio.pitch = pitch;
+                    menuSound.Play();
+                    break;
 
-            case "pitchUp":
-                Debug.Log("WULULU");
-                pitch += 0.1f;
-                GetChildObject(gameObject.transform, "PitchInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
-                audio.pitch = pitch;
-                menuSound.Play();
-                break;
+                case "pitchDown":
+                    pitch -= 0.1f;
+                    GetChildObject(gameObject.transform, "PitchInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
+                    audio.pitch = pitch;
+                    menuSound.Play();
+                    break;
 
-            case "pitchDown":
-            case "pitchDown1":
-                pitch -= 0.1f;
-                GetChildObject(gameObject.transform, "PitchInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(pitch * 10) / 10).ToString();
-                audio.pitch = pitch;
-                menuSound.Play();
-                break;
-                
-            case "volumeUp":
-                volume += 0.1f;
-                GetChildObject(gameObject.transform, "VolumeInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
-                audio.volume = volume;
-                menuSound.Play();
-                break;
+                case "volumeUp":
+                    volume += 0.1f;
+                    GetChildObject(gameObject.transform, "VolumeInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
+                    audio.volume = volume;
+                    menuSound.Play();
+                    break;
 
-            case "volumeDown":
-                volume -= 0.1f;
-                GetChildObject(gameObject.transform, "VolumeInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
-                audio.volume = volume;
-                menuSound.Play();
-                break;
+                case "volumeDown":
+                    volume -= 0.1f;
+                    GetChildObject(gameObject.transform, "VolumeInfoText").GetComponent<TextMesh>().text = (Mathf.Ceil(volume * 10) / 10).ToString();
+                    audio.volume = volume;
+                    menuSound.Play();
+                    break;
 
-            case "record":
-                audio.clip = Microphone.Start("Built-in Microphone", false, 2, 44100);
-                break;
+                case "record":
+                    audio.clip = Microphone.Start("Built-in Microphone", false, 2, 44100);
+                    break;
 
-            case "option":
-                //show buttons
-                if (!optionsShownFlag)
-                {
-                    /*
-                    GameObject pitchDown = Instantiate(VirtualButtonPitchDown, vb.transform.position + new Vector3(0f, 0f, -0.025f), vb.transform.rotation, gameObject.transform);
-                    GameObject pitchUp = Instantiate(VirtualButtonPitchUp, vb.transform.position + new Vector3(0.045f, 0f, -0.025f), vb.transform.rotation, gameObject.transform);
-                    GameObject record = Instantiate(VirtualButtonRecord, vb.transform.position + new Vector3(0.045f, 0f, 0f), vb.transform.rotation, gameObject.transform);
-                    */
-
-                    StateManager stateManager = TrackerManager.Instance.GetStateManager();
-
-                    foreach (TrackableBehaviour tb in stateManager.GetTrackableBehaviours())
+                case "option":
+                    //show buttons
+                    if (!optionsShownFlag)
                     {
+                        /*
+                        GameObject pitchDown = Instantiate(VirtualButtonPitchDown, vb.transform.position + new Vector3(0f, 0f, -0.025f), vb.transform.rotation, gameObject.transform);
+                        GameObject pitchUp = Instantiate(VirtualButtonPitchUp, vb.transform.position + new Vector3(0.045f, 0f, -0.025f), vb.transform.rotation, gameObject.transform);
+                        GameObject record = Instantiate(VirtualButtonRecord, vb.transform.position + new Vector3(0.045f, 0f, 0f), vb.transform.rotation, gameObject.transform);
+                        */
 
-                        //stateManager.
-                    }
+                        StateManager stateManager = TrackerManager.Instance.GetStateManager();
+
+                        foreach (TrackableBehaviour tb in stateManager.GetTrackableBehaviours())
+                        {
+
+                            //stateManager.
+                        }
 
                         ImageTargetBehaviour.CreateVirtualButton("pitchDown", new Vector2(0.02f, 0.015f), gameObject);
-                    /*
-                    foreach (GameObject button in GameObject.FindGameObjectsWithTag("OptionButtonDrum"))
-                    {
-                        button.GetComponent<VirtualButtonBehaviour>().enabled = true;
-                        button.GetComponent<VirtualButtonBehaviour>().RegisterEventHandler(this);
-                        button.GetComponent<VirtualButtonBehaviour>().UpdateAreaRectangle();
-                    }
-                    */
+                        /*
+                        foreach (GameObject button in GameObject.FindGameObjectsWithTag("OptionButtonDrum"))
+                        {
+                            button.GetComponent<VirtualButtonBehaviour>().enabled = true;
+                            button.GetComponent<VirtualButtonBehaviour>().RegisterEventHandler(this);
+                            button.GetComponent<VirtualButtonBehaviour>().UpdateAreaRectangle();
+                        }
+                        */
 
-                    optionsShownFlag = true;
-                } else //hide buttons
-                {
-                    foreach(GameObject button in GameObject.FindGameObjectsWithTag("OptionButtonDrum"))
-                    {
-                        Destroy(button);
+                        optionsShownFlag = true;
                     }
-                    optionsShownFlag = false;
-                }
-                break;
+                    else //hide buttons
+                    {
+                        foreach (GameObject button in GameObject.FindGameObjectsWithTag("OptionButtonDrum"))
+                        {
+                            Destroy(button);
+                        }
+                        optionsShownFlag = false;
+                    }
+                    break;
 
+            }
+        } else
+        {
+            //since there was no front page object, we can assume it is front page button and therefore a drum
+            audio.Play();
+            Animation anim = gameObject.GetComponentInChildren<Animation>();
+            anim.Play("drumAnim");
+            recorder.saveSound(gameObject);
         }
     }
 

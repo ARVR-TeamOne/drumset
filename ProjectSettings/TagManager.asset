@@ -12,6 +12,7 @@ TagManager:
   - PitchInfoText
   - VolumeInfoText
   - Recorder
+  - Metronome
   layers:
   - Default
   - TransparentFX

@@ -67,10 +67,10 @@
      <None Include="Assets\Vuforia\Shaders\DepthMask.shader" />
      <None Include="Assets\StreamingAssets\Vuforia\VuforiaMars_Images.xml" />
      <None Include="Assets\StreamingAssets\Vuforia\VRAR.xml" />
+     <None Include="Assets\StreamingAssets\Vuforia\Drummar.xml" />
      <None Include="Assets\StreamingAssets\Vuforia\Schlagzeug.xml" />
      <None Include="Assets\Vuforia\Shaders\BrightTexture.shader" />
      <None Include="Assets\StreamingAssets\Vuforia\VuforiaMars_VuMark.xml" />
-     <None Include="Assets\StreamingAssets\Vuforia\Drummar.xml" />
      <None Include="Assets\Editor\Vuforia\CylinderTargetTextures\VuforiaMars_Images\authoringinfo.xml" />
      <None Include="Assets\Vuforia\Shaders\Text3D.shader" />
      <None Include="Assets\SamplesResources\AugmentationAssets\Shaders\Character.shader" />

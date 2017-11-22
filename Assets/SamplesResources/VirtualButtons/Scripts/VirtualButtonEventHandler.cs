@@ -44,9 +44,9 @@ public class VirtualButtonEventHandler : MonoBehaviour,
     /// </summary>
     public void OnButtonPressed(VirtualButtonBehaviour vb)
     {
-        Debug.Log("OnButtonPressed: " + vb.VirtualButtonName);
+        //Debug.Log("OnButtonPressed: " + vb.VirtualButtonName);
 
-        SetVirtualButtonMaterial(m_VirtualButtonMaterialPressed);
+        //SetVirtualButtonMaterial(m_VirtualButtonMaterialPressed);
 
         // Add the material corresponding to this virtual button
         // to the active material list:
