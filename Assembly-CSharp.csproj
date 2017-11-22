@@ -97,6 +97,7 @@
      <Compile Include="Assets\SamplesResources\VuMark\Scripts\VuMarkTrackableEventHandler.cs" />
      <Compile Include="Assets\Scripts\DrumButtonEventHandler.cs" />
      <Compile Include="Assets\Scripts\MetronomeScript.cs" />
+     <Compile Include="Assets\Scripts\OptionButtonScript.cs" />
      <Compile Include="Assets\Scripts\RecorderScript.cs" />
      <Compile Include="Assets\Scripts\UIController.cs" />
      <Compile Include="Assets\Vuforia\Scripts\DefaultInitializationErrorHandler.cs" />

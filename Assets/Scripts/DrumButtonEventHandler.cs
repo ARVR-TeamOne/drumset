@@ -18,7 +18,6 @@ public class DrumButtonEventHandler : MonoBehaviour,
     #region PRIVATE_MEMBERS
     VirtualButtonBehaviour[] virtualButtonBehaviours;
     AudioSource menuSound;
-    bool optionsShownFlag = false;
     RecorderScript recorder;
     #endregion // PRIVATE_MEMBERS
 
@@ -107,46 +106,6 @@ public class DrumButtonEventHandler : MonoBehaviour,
 
                 case "record":
                     audio.clip = Microphone.Start("Built-in Microphone", false, 2, 44100);
-                    break;
-
-                case "option":
-                    //show buttons
-                    if (!optionsShownFlag)
-                    {
-                        /*
-                        GameObject pitchDown = Instantiate(VirtualButtonPitchDown, vb.transform.position + new Vector3(0f, 0f, -0.025f), vb.transform.rotation, gameObject.transform);
-                        GameObject pitchUp = Instantiate(VirtualButtonPitchUp, vb.transform.position + new Vector3(0.045f, 0f, -0.025f), vb.transform.rotation, gameObject.transform);
-                        GameObject record = Instantiate(VirtualButtonRecord, vb.transform.position + new Vector3(0.045f, 0f, 0f), vb.transform.rotation, gameObject.transform);
-                        */
-
-                        StateManager stateManager = TrackerManager.Instance.GetStateManager();
-
-                        foreach (TrackableBehaviour tb in stateManager.GetTrackableBehaviours())
-                        {
-
-                            //stateManager.
-                        }
-
-                        ImageTargetBehaviour.CreateVirtualButton("pitchDown", new Vector2(0.02f, 0.015f), gameObject);
-                        /*
-                        foreach (GameObject button in GameObject.FindGameObjectsWithTag("OptionButtonDrum"))
-                        {
-                            button.GetComponent<VirtualButtonBehaviour>().enabled = true;
-                            button.GetComponent<VirtualButtonBehaviour>().RegisterEventHandler(this);
-                            button.GetComponent<VirtualButtonBehaviour>().UpdateAreaRectangle();
-                        }
-                        */
-
-                        optionsShownFlag = true;
-                    }
-                    else //hide buttons
-                    {
-                        foreach (GameObject button in GameObject.FindGameObjectsWithTag("OptionButtonDrum"))
-                        {
-                            Destroy(button);
-                        }
-                        optionsShownFlag = false;
-                    }
                     break;
 
             }

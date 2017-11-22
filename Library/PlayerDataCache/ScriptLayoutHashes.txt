@@ -110,6 +110,7 @@ c7923a3eb125f8de271029a01b478392 Assembly-CSharp.dll:.CloudRecoContentManager
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.UDTSettings
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.DefaultInitializationErrorHandler
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.VuMarkHandler
+83b6b1dbbc968da67b3147e3f6857855 Assembly-CSharp.dll:.MetronomeScript
 dc07d7ad69b399a46e92c483bf1c04ca UnityEngine.Analytics.dll:UnityEngine.Analytics.AnalyticsTracker
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.LoadingScreen
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.TapHandler
@@ -187,8 +188,6 @@ af81a921b7f8543a1aaa2a5cb365859a Assembly-CSharp.dll:.DrillController
 a73dc3285fd5b06d04dff7acd30688f5 Assembly-CSharp.dll:.CloudRecoEventHandler
 9a87a9a12cf953f3e9ef199c87453ed5 Assembly-CSharp.dll:.OptionsConfig
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.RotateAroundCylinder
-05524b8f659e7bfe5756d1335fec24ba UnityEngine.Advertisements.dll:UnityEngine.Advertisements.CallbackExecutor
-05524b8f659e7bfe5756d1335fec24ba UnityEngine.Advertisements.dll:UnityEngine.Advertisements.Editor.Placeholder
 0d0b5a4e03a71e319150a5e3035d2272 Assembly-CSharp.dll:.MultiTargetTrackableEventHandler
 c70b17dda2d4b966f689f5aab4655905 Assembly-CSharp.dll:.UDTEventHandler
 3934ca8022d4c1e2d3df62eb846732fb Assembly-CSharp.dll:.MenuAnimator

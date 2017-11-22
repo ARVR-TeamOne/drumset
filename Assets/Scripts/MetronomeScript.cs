@@ -16,7 +16,7 @@ public class MetronomeScript : MonoBehaviour, IVirtualButtonEventHandler
     #region PRIVATE_MEMBERS
     AudioSource tickAudio;
     VirtualButtonBehaviour[] virtualButtonBehaviours;
-    private int BPM = 60;
+    private float BPM = 60;
     private float tickStartTimestamp = 0;
     #endregion
 
@@ -35,12 +35,12 @@ public class MetronomeScript : MonoBehaviour, IVirtualButtonEventHandler
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 		if(ticking && Time.time >= nextTickTimestamp)
         {
             tickAudio.Play();
             lastTickTimestamp = nextTickTimestamp;
-            nextTickTimestamp = nextTickTimestamp + 60 / BPM;
+            nextTickTimestamp = nextTickTimestamp + 60f / BPM;
         }
 	}
 
@@ -61,7 +61,7 @@ public class MetronomeScript : MonoBehaviour, IVirtualButtonEventHandler
     {
         tickStartTimestamp = Time.time;
         lastTickTimestamp = Time.time;
-        nextTickTimestamp = 60 / BPM + tickStartTimestamp;
+        nextTickTimestamp = 60f / BPM + tickStartTimestamp;
     }
 
     void stopMetronome()
@@ -79,15 +79,16 @@ public class MetronomeScript : MonoBehaviour, IVirtualButtonEventHandler
                 toggleMetronome();
                 break;
 
-            case "BPMup":
-
+            case "BPMUp":
+                BPM += 10f;
                 break;
 
-            case "BPMdown":
-
+            case "BPMDown":
+                BPM -= 10f;
                 break;
 
         }
+        Debug.Log(BPM);
     }
 
     public void OnButtonReleased(VirtualButtonBehaviour vb)

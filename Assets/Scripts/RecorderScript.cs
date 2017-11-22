@@ -90,6 +90,9 @@ public class RecorderScript : MonoBehaviour, IVirtualButtonEventHandler
     {
             if(!playing && recordedTimes.Count > 0)
             {
+                //stop metronome
+                metronome.ticking = false;
+
                 if(recording)
                 {
                     Debug.Log("Stop Recording");
@@ -135,6 +138,8 @@ public class RecorderScript : MonoBehaviour, IVirtualButtonEventHandler
         {
             Debug.Log("Stop Recording");
             recording = false;
+            //stop metronome
+            metronome.ticking = false;
         }
     }
 
@@ -146,10 +151,6 @@ public class RecorderScript : MonoBehaviour, IVirtualButtonEventHandler
             if (recordStartTime == -1)
             {
                 recordStartTime = Time.time;
-                recordedTimes.Add(0);
-                recordedLoop.Add(sender);
-
-                return;
             }
 
             float soundPlayedAtTime = Time.time;
@@ -158,30 +159,36 @@ public class RecorderScript : MonoBehaviour, IVirtualButtonEventHandler
             {
 
                 //align sound to metronome ticking
-                float metronomeAlignedTimestamp = soundPlayedAtTime > (metronome.nextTickTimestamp - metronome.lastTickTimestamp) / 2 ? metronome.nextTickTimestamp : metronome.lastTickTimestamp;
+                float metronomeAlignedTimestamp = soundPlayedAtTime > (metronome.nextTickTimestamp - metronome.lastTickTimestamp) / 2 ? metronome.nextTickTimestamp - recordStartTime : metronome.lastTickTimestamp - recordStartTime;
 
                 //check if sound is already played on this beat with same sender
-                foreach(GameObject obj in recordedLoop)
-                {
-                    Debug.Log(obj);
-                }
 
-                Debug.Log("sound on same beat");
-                Debug.Log(recordedTimes.ToArray().Select((b, i) => b == metronomeAlignedTimestamp ? i : -1).Where(i => {
-                    if (i == -1) return false;
-                    return recordedLoop[i] == sender;
-                }).ToList().Count);
+                Debug.Log("sounds on same beat:");
+                foreach (float wu in recordedTimes.ToArray().Select((b, i) => {
+                    Debug.Log(b);
+                    Debug.Log(i);
+                    return b == metronomeAlignedTimestamp ? i : -1;
+                    }).ToList())
+                {
+                    Debug.Log(wu);
+                    if (wu == -1) continue;
+                    Debug.Log(recordedLoop[(int) wu].name);
+                }
 
                 bool soundOnSameBeat = recordedTimes.ToArray().Select((b, i) => b == metronomeAlignedTimestamp ? i : -1).Where(i => {
                     if (i == -1) return false;
-                    return recordedLoop[i] == sender;
-                    }).ToList().Count > 0;
+                    Debug.Log("Object on same Beat:");
+                    Debug.Log(recordedLoop[i].name);
+                    return recordedLoop[i].name == sender.name;
+                    }).Count() > 0;
 
                 if (soundOnSameBeat)
                 {
+                    Debug.Log("Sound will not be saved");
                     return;
                 } else
                 {
+                    Debug.Log("Sound aligned to metronome");
                     soundPlayedAtTime = metronomeAlignedTimestamp;
                 }
             }
@@ -191,7 +198,7 @@ public class RecorderScript : MonoBehaviour, IVirtualButtonEventHandler
             Debug.Log(Time.time);
             Debug.Log(soundPlayedAtTime);
 
-            recordedTimes.Add(soundPlayedAtTime - recordStartTime);
+            recordedTimes.Add(soundPlayedAtTime);
             recordedLoop.Add(sender);
         }
     }
