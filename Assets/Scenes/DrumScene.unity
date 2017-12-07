@@ -3582,7 +3582,7 @@ GameObject:
   - component: {fileID: 996238122}
   m_Layer: 8
   m_Name: ImageTargetDrumFront
-  m_TagString: DrumOne
+  m_TagString: ImageTargetTrackStart
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5654,8 +5654,8 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1422568336}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 393, y: 140, z: 0}
-  m_LocalScale: {x: 0.7570502, y: 0.7570502, z: 0.7570502}
+  m_LocalPosition: {x: 306, y: 131.5, z: 0}
+  m_LocalScale: {x: 0.6474228, y: 0.6474228, z: 0.6474228}
   m_Children:
   - {fileID: 1138153187}
   m_Father: {fileID: 1918187002}
@@ -6898,7 +6898,7 @@ GameObject:
   - component: {fileID: 1736701992}
   m_Layer: 0
   m_Name: ImageTargetDrumBack
-  m_TagString: DrumOne
+  m_TagString: ImageTargetTrackEnd
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

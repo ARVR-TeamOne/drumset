@@ -44,7 +44,6 @@ MonoBehaviour:
       ContainsMagnet: 0
   databaseLoad:
     dataSetsToLoad:
-    - VuforiaMars_Images
     - Drummar
     dataSetsToActivate:
     - Drummar

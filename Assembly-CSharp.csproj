@@ -99,6 +99,7 @@
      <Compile Include="Assets\Scripts\MetronomeScript.cs" />
      <Compile Include="Assets\Scripts\OptionButtonScript.cs" />
      <Compile Include="Assets\Scripts\RecorderScript.cs" />
+     <Compile Include="Assets\Scripts\TrackScript.cs" />
      <Compile Include="Assets\Scripts\UIController.cs" />
      <Compile Include="Assets\Vuforia\Scripts\DefaultInitializationErrorHandler.cs" />
      <Compile Include="Assets\Vuforia\Scripts\DefaultSmartTerrainEventHandler.cs" />
