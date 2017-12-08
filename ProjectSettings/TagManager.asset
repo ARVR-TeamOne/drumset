@@ -15,6 +15,7 @@ TagManager:
   - Metronome
   - ImageTargetTrackStart
   - ImageTargetTrackEnd
+  - Note
   layers:
   - Default
   - TransparentFX

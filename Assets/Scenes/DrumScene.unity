@@ -1605,7 +1605,6 @@ GameObject:
   - component: {fileID: 273863731}
   - component: {fileID: 273863730}
   - component: {fileID: 273863729}
-  - component: {fileID: 273863728}
   m_Layer: 0
   m_Name: ImageTargetRecorder
   m_TagString: Recorder
@@ -1613,17 +1612,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &273863728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 273863727}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c1868e5b36a2aa40a542fdbf5698088, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!33 &273863729
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1900,14 +1888,13 @@ GameObject:
   m_Component:
   - component: {fileID: 417562953}
   - component: {fileID: 417562952}
-  - component: {fileID: 417562951}
   - component: {fileID: 417562950}
   - component: {fileID: 417562949}
   - component: {fileID: 417562948}
   - component: {fileID: 417562947}
   m_Layer: 0
   m_Name: ImageTargetDrum2Back
-  m_TagString: Untagged
+  m_TagString: ImageTargetTrackEnd
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1920,11 +1907,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 417562946}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03d9cb46c82384949bcf024bcd9b6770, type: 3}
+  m_Script: {fileID: 11500000, guid: d4c29cbb9afdc384ab8a210d75b37a63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MenuSoundObject: {fileID: 1774452929}
-  FrontPageObject: {fileID: 2089535367}
+  status: -1
 --- !u!33 &417562948
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1975,17 +1961,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1770992566, guid: bab6fa851cf5a1a4bba3cec5f191cb8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &417562951
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 417562946}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a917f0af64a6423093132dab321c15f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &417562952
@@ -2850,7 +2825,6 @@ GameObject:
   - component: {fileID: 757707623}
   - component: {fileID: 757707622}
   - component: {fileID: 757707621}
-  - component: {fileID: 757707627}
   - component: {fileID: 757707628}
   m_Layer: 0
   m_Name: ImageTargetMetronome
@@ -2966,20 +2940,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &757707627
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 757707620}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b66d7e4465ca73f41bdae3d1092146af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lastTickTimestamp: 0
-  nextTickTimestamp: 0
-  ticking: 0
 --- !u!82 &757707628
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3582,7 +3542,7 @@ GameObject:
   - component: {fileID: 996238122}
   m_Layer: 8
   m_Name: ImageTargetDrumFront
-  m_TagString: ImageTargetTrackStart
+  m_TagString: Note
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5654,8 +5614,8 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1422568336}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 306, y: 131.5, z: 0}
-  m_LocalScale: {x: 0.6474228, y: 0.6474228, z: 0.6474228}
+  m_LocalPosition: {x: 315, y: 134.5, z: 0}
+  m_LocalScale: {x: 0.6643253, y: 0.6643253, z: 0.6643253}
   m_Children:
   - {fileID: 1138153187}
   m_Father: {fileID: 1918187002}
@@ -6898,7 +6858,7 @@ GameObject:
   - component: {fileID: 1736701992}
   m_Layer: 0
   m_Name: ImageTargetDrumBack
-  m_TagString: ImageTargetTrackEnd
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9272,15 +9232,15 @@ GameObject:
   m_Component:
   - component: {fileID: 2089535374}
   - component: {fileID: 2089535373}
-  - component: {fileID: 2089535372}
   - component: {fileID: 2089535371}
   - component: {fileID: 2089535370}
   - component: {fileID: 2089535369}
-  - component: {fileID: 2089535368}
   - component: {fileID: 2089535375}
+  - component: {fileID: 2089535368}
+  - component: {fileID: 2089535372}
   m_Layer: 0
   m_Name: ImageTargetDrum2Front
-  m_TagString: Untagged
+  m_TagString: ImageTargetTrackStart
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -9293,11 +9253,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2089535367}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 03d9cb46c82384949bcf024bcd9b6770, type: 3}
+  m_Script: {fileID: 11500000, guid: 0a4d511b823b5c54ba13cd93fb1914f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MenuSoundObject: {fileID: 0}
-  FrontPageObject: {fileID: 0}
+  TrackSlider: {fileID: 0}
 --- !u!33 &2089535369
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -9358,9 +9317,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2089535367}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5a917f0af64a6423093132dab321c15f, type: 3}
+  m_Script: {fileID: 11500000, guid: d4c29cbb9afdc384ab8a210d75b37a63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  status: -1
 --- !u!114 &2089535373
 MonoBehaviour:
   m_ObjectHideFlags: 0
