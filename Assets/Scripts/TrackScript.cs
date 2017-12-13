@@ -7,8 +7,10 @@ using Vuforia;
 public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
 
     public GameObject TrackSlider;
+    public GameObject ProjectedNote;
 
     private GameObject TrackSliderInstance;
+    private GameObject ProjectedNoteInstance;
     private GameObject ImageTargetTrackStart;
     private GameObject ImageTargetTrackEnd;
     private TrackTargetTrackableEventHandler ImageTargetTrackStartTrackable;
@@ -25,6 +27,8 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
 
     // Use this for initialization
     void Start () {
+
+        ProjectedNoteInstance = Instantiate(ProjectedNote);
 
         // Register with the virtual buttons TrackableBehaviour
         virtualButtonBehaviours = GetComponentsInChildren<VirtualButtonBehaviour>();
@@ -69,6 +73,11 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
             MainTrackLine.SetPosition(0, ImageTargetTrackStart.transform.position);
             MainTrackLine.SetPosition(1, ImageTargetTrackEnd.transform.position);
 
+            Debug.Log("Start Position:");
+            Debug.Log(ImageTargetTrackStart.transform.position);
+            Debug.Log("End Position:");
+            Debug.Log(ImageTargetTrackEnd.transform.position);
+
             /*
              * calculate note positions
              */
@@ -101,24 +110,26 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                     Vector3 trackSurfaceVector = ImageTargetTrackStart.transform.position - ImageTargetTrackEnd.transform.position;
 
                     //get Normal of plane
-                    Vector3 PlaneNormal = ImageTargetTrackStart.GetComponentInChildren<MeshFilter>().mesh.normals[0];
+                    Vector3 PlaneNormal = Vector3.Cross(GetChildObject(ImageTargetTrackStart.transform, "Normal").transform.position - ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position - ImageTargetTrackStart.transform.position);
 
                     //project note onto plane
                     Vector3 v = Note.transform.position - trackSurfaceVector;
                     Vector3 d = Vector3.Project(v, PlaneNormal);
-                    Note.transform.position = Note.transform.position - d;
+                    Vector3 ProjectedNoteVector = Note.transform.position - d;
+
+                    ProjectedNoteInstance.transform.position = ProjectedNoteVector;
 
                     //align note rotation to plane rotation
-                    Note.transform.rotation = ImageTargetTrackStart.transform.rotation;
+                    //Note.transform.rotation = ImageTargetTrackStart.transform.rotation;
 
-                    Debug.Log("Plane Normal:");
-                    Debug.Log(Note.transform.position);
+                    Debug.Log("Normal:");
+                    Debug.Log(ImageTargetTrackStart.GetComponentInChildren<MeshFilter>().mesh.normals[0].normalized);
+
                     Debug.Log("Projected Note:");
-                    Debug.Log(Note.transform.position);
+                    Debug.Log(ProjectedNoteVector);
 
                     //get orthogonal angle from trackVector to note
-                    Vector3 noteTrackPosition = NearestPointOnLine(ImageTargetTrackStart.transform.position, (ImageTargetTrackStart.transform.position - ImageTargetTrackEnd.transform.position).normalized, Note.transform.position);
-
+                    Vector3 noteTrackPosition = NearestPointOnLine(ImageTargetTrackStart.transform.position, (ImageTargetTrackStart.transform.position - ImageTargetTrackEnd.transform.position).normalized, ProjectedNoteVector);
 
                     Debug.Log("Track Position:");
                     Debug.Log(noteTrackPosition);
@@ -126,7 +137,7 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                     //create note obj
                     float noteTrackDistance = Vector3.Distance(ImageTargetTrackStart.transform.position, noteTrackPosition) <= trackLength && Vector3.Distance(ImageTargetTrackEnd.transform.position, noteTrackPosition) <= trackLength ? Vector3.Distance(ImageTargetTrackStart.transform.position, noteTrackPosition) : -Vector3.Distance(ImageTargetTrackEnd.transform.position, noteTrackPosition); //Distance is always positive, so make it negative if it is larger than the total tracklength
                     float noteTrackTimestamp = Mathf.Ceil((TRACK_DURATION / trackLength * noteTrackDistance) * 100) / 100;
-                    float volume = Mathf.Ceil((1 / VOLUME_DISTANCE * Vector3.Distance(noteTrackPosition, Note.transform.position)) * 100) / 100;
+                    float volume = Mathf.Ceil((1 / VOLUME_DISTANCE * Vector3.Distance(noteTrackPosition, ProjectedNoteVector)) * 100) / 100;
 
                     Debug.Log("Track Timestamp:" + noteTrackTimestamp.ToString());
                     Debug.Log("Volume:" + volume.ToString());
@@ -143,7 +154,7 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                         NoteLine.SetVertexCount(2);
 
                         NoteLine.SetPosition(0, noteTrackPosition);
-                        NoteLine.SetPosition(1, Note.transform.position);
+                        NoteLine.SetPosition(1, ProjectedNoteVector);
 
                         NoteList.Add(new global::Note(Note, noteTrackTimestamp, 1, volume));
 
@@ -158,21 +169,26 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                 }
             }
 
+
             /*
              * play sounds
              */
 
             if (playing)
             {
+
+                float playTimestamp = Time.time - playStartTimestamp;
+                Debug.Log("Play Timestamp: " + playTimestamp.ToString());
+                Debug.Log("Slider Delta:");
+                Debug.Log(trackLength / TRACK_DURATION * playTimestamp);
+                TrackSliderInstance.transform.position = Vector3.MoveTowards(ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position, trackLength / TRACK_DURATION * playTimestamp);
+
                 for (int i = lastPlayedNoteIndex + 1; i < NoteList.Count; i++)
                 {
-                    float playTimestamp = Time.time - playStartTimestamp;
-
                     //play note and break if it is due
-                    if (playTimestamp <= NoteList[i].TrackTimestamp)
+                    if (playTimestamp >= NoteList[i].TrackTimestamp)
                     {
                         Debug.Log("Play Note " + NoteList[i].ImageTarget.GetComponent<ImageTargetBehaviour>().name);
-                        TrackSliderInstance.transform.position = Vector3.MoveTowards(ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position, trackLength / TRACK_DURATION * playTimestamp);
                         AudioSource NoteToPlay = NoteList[i].ImageTarget.GetComponent<AudioSource>();
                         NoteToPlay.volume = NoteList[i].Volume;
                         NoteToPlay.pitch = NoteList[i].Pitch;
@@ -183,7 +199,7 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                 }
 
                 //rewind if loop is played
-                if(lastPlayedNoteIndex == NoteList.Count - 1)
+                if (playTimestamp >= TRACK_DURATION)
                 {
                     lastPlayedNoteIndex = -1;
                     playStartTimestamp = Time.time;
@@ -199,7 +215,7 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
 
         if(playing)
         {
-            GameObject TrackSliderInstance = Instantiate(TrackSlider);
+            TrackSliderInstance = Instantiate(TrackSlider);
             TrackSliderInstance.transform.position = ImageTargetTrackStart.transform.position;
             TrackSliderInstance.transform.rotation = ImageTargetTrackStart.transform.rotation;
 

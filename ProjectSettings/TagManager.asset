@@ -17,6 +17,7 @@ TagManager:
   - ImageTargetTrackEnd
   - Note
   - TrackTimestampInfoText
+  - Normal
   layers:
   - Default
   - TransparentFX
