@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="qcar_config.xsd">
   <Tracking>
+    <ImageTarget name="Snare" size="0.160000 0.160352" />
+    <ImageTarget name="ChinaRound" size="0.160000 0.160000" />
+    <ImageTarget name="HihatRound" size="0.160000 0.160352" />
+    <ImageTarget name="BassdrumRound" size="0.160000 0.160352" />
     <ImageTarget name="BassDrum_Back" size="0.098000 0.140959" />
     <ImageTarget name="BassDrum_Front" size="0.098000 0.140959" />
     <ImageTarget name="001_Front" size="0.035000 0.060000" />
