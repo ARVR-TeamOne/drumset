@@ -10,9 +10,10 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
     public GameObject ProjectedNote;
 
     private GameObject TrackSliderInstance;
-    private GameObject ProjectedNoteInstance;
+    private List<GameObject> ProjectedNoteInstances = new List<GameObject>();
     private GameObject ImageTargetTrackStart;
     private GameObject ImageTargetTrackEnd;
+    private GameObject TrackPlane;
     private TrackTargetTrackableEventHandler ImageTargetTrackStartTrackable;
     private TrackTargetTrackableEventHandler ImageTargetTrackEndTrackable;
     VirtualButtonBehaviour[] virtualButtonBehaviours;
@@ -21,15 +22,12 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
     private List<Note> NoteList = new List<Note>();
     private int lastPlayedNoteIndex = -1;
     private const float TRACK_DURATION = 8f;            //playtime of the track in seconds
-    private const float VOLUME_DISTANCE = 0.3f;         //distance of note from main track line for full volume
+    private const float VOLUME_DISTANCE = 0.2f;         //distance of note from main track line for full volume
     private bool playing = false;
     private float playStartTimestamp;
 
     // Use this for initialization
     void Start () {
-
-        ProjectedNoteInstance = Instantiate(ProjectedNote);
-
         // Register with the virtual buttons TrackableBehaviour
         virtualButtonBehaviours = GetComponentsInChildren<VirtualButtonBehaviour>();
 
@@ -52,6 +50,12 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
         MainTrackLine.SetVertexCount(2);
         //draw trackline
         MainTrackLine.SetVertexCount(2);
+
+        //create previewplane
+        TrackPlane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        TrackPlane.name = "TrackPlane";
+        TrackPlane.transform.position = new Vector3(-1, -1, -1);
+        TrackPlane.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
     }
 	
 	// Update is called once per frame
@@ -65,8 +69,17 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
 
         TrackLines.Clear();
 
+        //clear all projected notes
+        foreach (GameObject projectedNoteObject in ProjectedNoteInstances)
+        {
+            Destroy(projectedNoteObject);
+        }
+
+        ProjectedNoteInstances.Clear();
+
         MainTrackLine.SetVertexCount(0);
 
+        //if start and end marker are tracked
         if (ImageTargetTrackStart.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED && ImageTargetTrackEnd.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED)
         {
             MainTrackLine.SetVertexCount(2);
@@ -84,8 +97,35 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
 
             LineRenderer NoteLine;
 
-            //calculate some track metrics
+            //calculate track length
             float trackLength = Vector3.Distance(ImageTargetTrackEnd.transform.position, ImageTargetTrackStart.transform.position);
+
+            //get track middle point
+            Vector3 TrackMiddleVector = (ImageTargetTrackStart.transform.position + ImageTargetTrackEnd.transform.position) / 2;
+
+            //get average rotation of track
+            Quaternion TrackRotation = new Quaternion((ImageTargetTrackStart.transform.rotation.x + ImageTargetTrackEnd.transform.rotation.x) / 2, (ImageTargetTrackStart.transform.rotation.y + ImageTargetTrackEnd.transform.rotation.y) / 2, (ImageTargetTrackStart.transform.rotation.z + ImageTargetTrackEnd.transform.rotation.z) / 2, (ImageTargetTrackStart.transform.rotation.w + ImageTargetTrackEnd.transform.rotation.w) / 2);
+
+            //get normal of track
+            Vector3 TrackNormal = TrackPlane.GetComponent<MeshFilter>().mesh.normals[0].normalized;
+
+            Vector3 TrackMeshPoint = TrackPlane.transform.TransformPoint(TrackPlane.GetComponent<MeshFilter>().mesh.vertices[0]);
+
+            TrackPlane.transform.position = TrackMiddleVector;
+            TrackPlane.transform.rotation = TrackRotation;
+            TrackPlane.transform.localScale = new Vector3(trackLength * 0.1f, 0.1f, 0.03f);
+
+            Debug.Log("Track Middle Vector");
+            Debug.Log(TrackMiddleVector);
+
+            Debug.Log("Track Rotation");
+            Debug.Log(TrackRotation);
+
+            Debug.Log("Track Normal");
+            Debug.Log(TrackNormal);
+
+            //create surface vector to project note onto
+            //Vector3 trackSurfaceVector = ImageTargetTrackStart.transform.position - ImageTargetTrackEnd.transform.position;
 
             //for each target
             foreach (GameObject Note in GameObject.FindGameObjectsWithTag("Note"))
@@ -103,27 +143,34 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                     //Vector3 PlaneNormal = GetNormal(ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position, Note.transform.position);
                     //Note.transform.position = Vector3.ProjectOnPlane(Note.transform.position, PlaneNormal);
 
+                    //center note position
+                    Note.transform.position = GetChildObject(Note.transform, "NoteCenter").transform.position;
+
                     Debug.Log("Note Position:");
                     Debug.Log(Note.transform.position);
 
-                    //create surface vector to project note onto
-                    Vector3 trackSurfaceVector = ImageTargetTrackStart.transform.position - ImageTargetTrackEnd.transform.position;
-
                     //get Normal of plane
-                    Vector3 PlaneNormal = Vector3.Cross(GetChildObject(ImageTargetTrackStart.transform, "Normal").transform.position - ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position - ImageTargetTrackStart.transform.position);
+                    //Vector3 PlaneNormal = Vector3.Cross(GetChildObject(ImageTargetTrackStart.transform, "Normal").transform.position - ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position - ImageTargetTrackStart.transform.position);
 
                     //project note onto plane
-                    Vector3 v = Note.transform.position - trackSurfaceVector;
+                    /*Vector3 v = Note.transform.position - trackSurfaceVector;
                     Vector3 d = Vector3.Project(v, PlaneNormal);
                     Vector3 ProjectedNoteVector = Note.transform.position - d;
+                    */
 
-                    ProjectedNoteInstance.transform.position = ProjectedNoteVector;
+                    Vector3 ProjectedNoteVector = new Vector3(0, 0, 0);
+
+                    try
+                    {
+                        ProjectedNoteVector = GetClosestPointOnSurface(Note.transform.position, ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position, TrackMeshPoint);
+                    } catch(Exception e)
+                    {
+                        //skip note if it cannot be projected
+                        continue;
+                    }
 
                     //align note rotation to plane rotation
                     //Note.transform.rotation = ImageTargetTrackStart.transform.rotation;
-
-                    Debug.Log("Normal:");
-                    Debug.Log(ImageTargetTrackStart.GetComponentInChildren<MeshFilter>().mesh.normals[0].normalized);
 
                     Debug.Log("Projected Note:");
                     Debug.Log(ProjectedNoteVector);
@@ -134,38 +181,60 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                     Debug.Log("Track Position:");
                     Debug.Log(noteTrackPosition);
 
-                    //create note obj
-                    float noteTrackDistance = Vector3.Distance(ImageTargetTrackStart.transform.position, noteTrackPosition) <= trackLength && Vector3.Distance(ImageTargetTrackEnd.transform.position, noteTrackPosition) <= trackLength ? Vector3.Distance(ImageTargetTrackStart.transform.position, noteTrackPosition) : -Vector3.Distance(ImageTargetTrackEnd.transform.position, noteTrackPosition); //Distance is always positive, so make it negative if it is larger than the total tracklength
-                    float noteTrackTimestamp = Mathf.Ceil((TRACK_DURATION / trackLength * noteTrackDistance) * 100) / 100;
+                    /*
+                     * create note obj
+                     * 1. Get Distance noteTrackPosition to trackStartPosition
+                     * 2. Calculate timestamp from that Distance
+                     */
+                    float noteTrackDistanceStart = Vector3.Distance(ImageTargetTrackStart.transform.position, noteTrackPosition);
+                    float noteTrackDistanceEnd = Vector3.Distance(ImageTargetTrackEnd.transform.position, noteTrackPosition);
+                    float noteTrackTimestamp = 0f;
+
+                    Debug.Log("Track Length: " + trackLength.ToString());
+                    Debug.Log("Note Distance Start: " + noteTrackDistanceStart.ToString());
+                    Debug.Log("Note Distance End: " + noteTrackDistanceEnd.ToString());
+
+                    //check if noteTrackPosition is inbetween trackstart and trackend
+                    if (noteTrackDistanceStart <= trackLength && noteTrackDistanceEnd <= trackLength)
+                    {
+                        noteTrackTimestamp = Mathf.Ceil((TRACK_DURATION / trackLength * noteTrackDistanceStart) * 100) / 100;
+                    } else
+                    {
+                        Debug.Log("Note is not on Trackline, skipping");
+                        continue;
+                    }
+
                     float volume = Mathf.Ceil((1 / VOLUME_DISTANCE * Vector3.Distance(noteTrackPosition, ProjectedNoteVector)) * 100) / 100;
 
                     Debug.Log("Track Timestamp:" + noteTrackTimestamp.ToString());
+                    Debug.Log("Track Distance:" + noteTrackDistanceStart.ToString());
                     Debug.Log("Volume:" + volume.ToString());
 
-                    //proceed if note is on the maintrackline
-                    if (noteTrackTimestamp > 0 && noteTrackTimestamp <= TRACK_DURATION) { 
-                        //draw noteline
-                        TrackLines.Add(new GameObject());
-                        NoteLine = TrackLines[TrackLines.Count - 1].gameObject.AddComponent<LineRenderer>();
-                        // Set the width of the Line Renderer
-                        NoteLine.SetWidth(0.005F, 0.015F);
-                        NoteLine.SetColors(new Color(0, 0, 255), new Color(0, 255, 255));
-                        // Set the number of vertex fo the Line Renderer
-                        NoteLine.SetVertexCount(2);
+                    //create projectNoteObject where note is projected onto trackPlane
+                    GameObject ProjectedNoteInstance = Instantiate(ProjectedNote);
+                    ProjectedNoteInstance.transform.position = ProjectedNoteVector;
+                    ProjectedNoteInstances.Add(ProjectedNoteInstance);
+                    
+                    //draw line from projected note to trackline
+                    TrackLines.Add(new GameObject());
+                    NoteLine = TrackLines[TrackLines.Count - 1].gameObject.AddComponent<LineRenderer>();
+                    // Set the width of the Line Renderer
+                    NoteLine.SetWidth(0.005F, 0.015F);
+                    NoteLine.SetColors(new Color(0, 0, 255), new Color(0, 255, 255));
+                    // Set the number of vertex fo the Line Renderer
+                    NoteLine.SetVertexCount(2);
 
-                        NoteLine.SetPosition(0, noteTrackPosition);
-                        NoteLine.SetPosition(1, ProjectedNoteVector);
+                    NoteLine.SetPosition(0, noteTrackPosition);
+                    NoteLine.SetPosition(1, ProjectedNoteVector);
 
-                        NoteList.Add(new global::Note(Note, noteTrackTimestamp, 1, volume));
+                    NoteList.Add(new global::Note(Note, noteTrackTimestamp, 1, volume));
 
-                        //set infotexts
-                        GetChildObject(Note.transform, "TrackTimestampInfoText").GetComponent<TextMesh>().text = noteTrackTimestamp.ToString() + "s";
+                    //set infotexts
+                    GetChildObject(Note.transform, "TrackTimestampInfoText").GetComponent<TextMesh>().text = noteTrackTimestamp.ToString() + "s";
+                    GetChildObject(Note.transform, "TrackVolumeInfoText").GetComponent<TextMesh>().text = volume.ToString();
 
-                        Debug.Log("Note saved");
-                    } else
-                    {
-                        Debug.Log("Note not saved");
-                    }
+                    Debug.Log("Note saved");
+                    
                 }
             }
 
@@ -205,23 +274,36 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                     playStartTimestamp = Time.time;
                 }
             }
+        } else
+        {
+            TrackPlane.transform.position = new Vector3(-1, -1, -1);
+
+            //stop playing if track is lost
+            if (playing) togglePlaying();
         }
+
+        //move trackplane behind the camera before rendering it
+        TrackPlane.transform.position = new Vector3(-1, -1, -1);
     }
 
     private void togglePlaying()
     {
-        playing = !playing;
-        playStartTimestamp = Time.time;
-
-        if(playing)
+        //if track is displayed
+        if (ImageTargetTrackStart.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED && ImageTargetTrackEnd.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED)
         {
-            TrackSliderInstance = Instantiate(TrackSlider);
-            TrackSliderInstance.transform.position = ImageTargetTrackStart.transform.position;
-            TrackSliderInstance.transform.rotation = ImageTargetTrackStart.transform.rotation;
+            playing = !playing;
+            playStartTimestamp = Time.time;
 
-        } else
-        {
-            Destroy(TrackSliderInstance);
+            if (playing)
+            {
+                TrackSliderInstance = Instantiate(TrackSlider);
+                TrackSliderInstance.transform.position = ImageTargetTrackStart.transform.position;
+                TrackSliderInstance.transform.rotation = ImageTargetTrackStart.transform.rotation;
+            }
+            else
+            {
+                Destroy(TrackSliderInstance);
+            }
         }
     }
 
@@ -277,6 +359,81 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
         }
 
         return null;
+    }
+
+    private Vector3 ProjectTransformOnPlane(Transform objectToProject, Vector3 planeOrigin, Vector3 planeNormal) 
+    {
+        Plane projectionPlane = new Plane(planeNormal, planeOrigin);
+
+        //return projectionPlane.ClosestPointOnPlane(objectToProject.position);
+
+        float distanceToIntersection;
+        Ray intersectionRay = new Ray(objectToProject.position, objectToProject.forward);
+        if (projectionPlane.Raycast(intersectionRay, out distanceToIntersection))
+        {
+            return objectToProject.position + objectToProject.forward * distanceToIntersection;
+        }
+
+        Debug.Log("Cannot Project Note");
+        throw new Exception("Cannot Project Note");
+    }
+
+    /*
+    private Vector3 ProjectPointOnPlane(Vector3 point, Vector3 planeOrigin, Vector3 planeNormal)
+    {
+        planeNormal.Normalize();
+        var distance = -Vector3.Dot(planeNormal.normalized, (point - planeOrigin));
+        return point + planeNormal * distance;
+    }
+    */
+    /*
+    public static Vector3 ProjectPointOnPlane(Vector3 point, Vector3 planePoint, Vector3 planeNormal)
+    {
+
+        float distance;
+        Vector3 translationVector;
+
+        //First calculate the distance from the point to the plane:
+        distance = SignedDistancePlanePoint(planeNormal, planePoint, point);
+
+        //Reverse the sign of the distance
+        distance *= -1;
+
+        //Get a translation vector
+        translationVector = SetVectorLength(planeNormal, distance);
+
+        //Translate the point to form a projection
+        return point + translationVector;
+    }
+
+
+
+    //Get the shortest distance between a point and a plane. The output is signed so it holds information
+    //as to which side of the plane normal the point is.
+    public static float SignedDistancePlanePoint(Vector3 planeNormal, Vector3 planePoint, Vector3 point)
+    {
+
+        return Vector3.Dot(planeNormal, (point - planePoint));
+    }
+
+
+
+    //create a vector of direction "vector" with length "size"
+    public static Vector3 SetVectorLength(Vector3 vector, float size)
+    {
+
+        //normalize the vector
+        Vector3 vectorNormalized = Vector3.Normalize(vector);
+
+        //scale the vector
+        return vectorNormalized *= size;
+    }
+    */
+
+    private Vector3 GetClosestPointOnSurface(Vector3 point, Vector3 a, Vector3 b, Vector3 c)
+    {
+        Plane plane = new Plane(a, b, c);
+        return plane.ClosestPointOnPlane(point);
     }
 }
 

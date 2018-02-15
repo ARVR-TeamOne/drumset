@@ -18,6 +18,8 @@ TagManager:
   - Note
   - TrackTimestampInfoText
   - Normal
+  - TrackVolumeInfoText
+  - NoteCenter
   layers:
   - Default
   - TransparentFX

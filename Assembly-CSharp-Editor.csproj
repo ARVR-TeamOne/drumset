@@ -60,13 +60,13 @@
      <None Include="Assets\SamplesResources\VirtualButtons\Shaders\Gradient.shader" />
      <None Include="Assets\SamplesResources\CloudReco\Shaders\CR_Custom_TransparentUnlit.shader" />
      <None Include="Assets\Vuforia\Shaders\VertexLitWithZ.shader" />
+     <None Include="Assets\StreamingAssets\Vuforia\Drummar.xml" />
      <None Include="Assets\Editor\Vuforia\VuforiaMars_VuMark\authoringinfo.xml" />
      <None Include="Assets\SamplesResources\AugmentationAssets\Shaders\CharacterHelper.cginc" />
      <None Include="Assets\Editor\Vuforia\TargetsetData\VuforiaMars_Object_info.xml" />
      <None Include="Assets\StreamingAssets\Vuforia\VuforiaMars_Object_OT.xml" />
      <None Include="Assets\Vuforia\Shaders\DepthMask.shader" />
      <None Include="Assets\StreamingAssets\Vuforia\VuforiaMars_Images.xml" />
-     <None Include="Assets\StreamingAssets\Vuforia\Drummar.xml" />
      <None Include="Assets\StreamingAssets\Vuforia\VRAR.xml" />
      <None Include="Assets\StreamingAssets\Vuforia\Schlagzeug.xml" />
      <None Include="Assets\Vuforia\Shaders\BrightTexture.shader" />
