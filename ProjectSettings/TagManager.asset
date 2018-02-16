@@ -20,6 +20,9 @@ TagManager:
   - Normal
   - TrackVolumeInfoText
   - NoteCenter
+  - BPMUp
+  - BPMDown
+  - TrackPitchInfoText
   layers:
   - Default
   - TransparentFX

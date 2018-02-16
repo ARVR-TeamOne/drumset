@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vuforia;
 
-public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
+public class TrackScript : MonoBehaviour {
 
     public GameObject TrackSlider;
     public GameObject ProjectedNote;
@@ -16,7 +16,6 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
     private GameObject TrackPlane;
     private TrackTargetTrackableEventHandler ImageTargetTrackStartTrackable;
     private TrackTargetTrackableEventHandler ImageTargetTrackEndTrackable;
-    VirtualButtonBehaviour[] virtualButtonBehaviours;
     private LineRenderer MainTrackLine;
     private List<GameObject> TrackLines = new List<GameObject>();
     private List<Note> NoteList = new List<Note>();
@@ -25,16 +24,10 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
     private const float VOLUME_DISTANCE = 0.2f;         //distance of note from main track line for full volume
     private bool playing = false;
     private float playStartTimestamp;
+    private bool looping;
 
     // Use this for initialization
     void Start () {
-        // Register with the virtual buttons TrackableBehaviour
-        virtualButtonBehaviours = GetComponentsInChildren<VirtualButtonBehaviour>();
-
-        for (int i = 0; i < virtualButtonBehaviours.Length; ++i)
-        {
-            virtualButtonBehaviours[i].RegisterEventHandler(this);
-        }
 
         ImageTargetTrackStart = GameObject.FindGameObjectWithTag("ImageTargetTrackStart");
         ImageTargetTrackStartTrackable = ImageTargetTrackStart.GetComponent<TrackTargetTrackableEventHandler>();
@@ -86,10 +79,13 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
             MainTrackLine.SetPosition(0, ImageTargetTrackStart.transform.position);
             MainTrackLine.SetPosition(1, ImageTargetTrackEnd.transform.position);
 
+            //DEBUG
+            /*
             Debug.Log("Start Position:");
             Debug.Log(ImageTargetTrackStart.transform.position);
             Debug.Log("End Position:");
             Debug.Log(ImageTargetTrackEnd.transform.position);
+            */
 
             /*
              * calculate note positions
@@ -115,6 +111,8 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
             TrackPlane.transform.rotation = TrackRotation;
             TrackPlane.transform.localScale = new Vector3(trackLength * 0.1f, 0.1f, 0.03f);
 
+            //DEBUG
+            /*
             Debug.Log("Track Middle Vector");
             Debug.Log(TrackMiddleVector);
 
@@ -123,6 +121,7 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
 
             Debug.Log("Track Normal");
             Debug.Log(TrackNormal);
+            */
 
             //create surface vector to project note onto
             //Vector3 trackSurfaceVector = ImageTargetTrackStart.transform.position - ImageTargetTrackEnd.transform.position;
@@ -146,9 +145,6 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                     //center note position
                     Note.transform.position = GetChildObject(Note.transform, "NoteCenter").transform.position;
 
-                    Debug.Log("Note Position:");
-                    Debug.Log(Note.transform.position);
-
                     //get Normal of plane
                     //Vector3 PlaneNormal = Vector3.Cross(GetChildObject(ImageTargetTrackStart.transform, "Normal").transform.position - ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position - ImageTargetTrackStart.transform.position);
 
@@ -160,55 +156,70 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
 
                     Vector3 ProjectedNoteVector = new Vector3(0, 0, 0);
 
-                    try
-                    {
-                        ProjectedNoteVector = GetClosestPointOnSurface(Note.transform.position, ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position, TrackMeshPoint);
-                    } catch(Exception e)
-                    {
-                        //skip note if it cannot be projected
-                        continue;
-                    }
+                    ProjectedNoteVector = GetClosestPointOnSurface(Note.transform.position, ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position, TrackMeshPoint);
 
                     //align note rotation to plane rotation
                     //Note.transform.rotation = ImageTargetTrackStart.transform.rotation;
 
-                    Debug.Log("Projected Note:");
-                    Debug.Log(ProjectedNoteVector);
-
                     //get orthogonal angle from trackVector to note
                     Vector3 noteTrackPosition = NearestPointOnLine(ImageTargetTrackStart.transform.position, (ImageTargetTrackStart.transform.position - ImageTargetTrackEnd.transform.position).normalized, ProjectedNoteVector);
-
-                    Debug.Log("Track Position:");
-                    Debug.Log(noteTrackPosition);
 
                     /*
                      * create note obj
                      * 1. Get Distance noteTrackPosition to trackStartPosition
                      * 2. Calculate timestamp from that Distance
+                     * 3. Get Distance From Projected Note to TrackLine, Compute Volume From that Distance
+                     * 4. Project Note Rotation on TrackPlane, save Y-Rotatation as Pitch
                      */
+
+                    //1
                     float noteTrackDistanceStart = Vector3.Distance(ImageTargetTrackStart.transform.position, noteTrackPosition);
                     float noteTrackDistanceEnd = Vector3.Distance(ImageTargetTrackEnd.transform.position, noteTrackPosition);
                     float noteTrackTimestamp = 0f;
 
+                    //DEBUG
+                    /*
+                    Debug.Log("Note Position:");
+                    Debug.Log(Note.transform.position);
+                    Debug.Log("Projected Note:");
+                    Debug.Log(ProjectedNoteVector);
+                    Debug.Log("Track Position:");
+                    Debug.Log(noteTrackPosition);
                     Debug.Log("Track Length: " + trackLength.ToString());
                     Debug.Log("Note Distance Start: " + noteTrackDistanceStart.ToString());
                     Debug.Log("Note Distance End: " + noteTrackDistanceEnd.ToString());
+                    */
 
+                    //2
                     //check if noteTrackPosition is inbetween trackstart and trackend
                     if (noteTrackDistanceStart <= trackLength && noteTrackDistanceEnd <= trackLength)
                     {
-                        noteTrackTimestamp = Mathf.Ceil((TRACK_DURATION / trackLength * noteTrackDistanceStart) * 100) / 100;
+                        noteTrackTimestamp = Mathf.Ceil((TRACK_DURATION / trackLength * noteTrackDistanceStart) * 10) / 10;
                     } else
                     {
                         Debug.Log("Note is not on Trackline, skipping");
                         continue;
                     }
 
-                    float volume = Mathf.Ceil((1 / VOLUME_DISTANCE * Vector3.Distance(noteTrackPosition, ProjectedNoteVector)) * 100) / 100;
+                    //3
+                    float volume = Mathf.Ceil((1 / VOLUME_DISTANCE * Vector3.Distance(noteTrackPosition, ProjectedNoteVector)) * 10) / 10;
 
+                    //4
+                    Quaternion projectedNoteRotation = Quaternion.Inverse(TrackPlane.transform.rotation) * Note.transform.rotation;
+                    float pitch = Mathf.Ceil((projectedNoteRotation.y + 1f) * 100) / 100;
+
+                    //DEBUG
+                    /*
+                    Debug.Log("Note Rotation:");
+                    Debug.Log(Note.transform.rotation);
+                    Debug.Log("Projected Note Rotation:");
+                    Debug.Log(projectedNoteRotation);
+                    Debug.Log("Track Timestamp:" + noteTrackTimestamp.ToString());
                     Debug.Log("Track Timestamp:" + noteTrackTimestamp.ToString());
                     Debug.Log("Track Distance:" + noteTrackDistanceStart.ToString());
                     Debug.Log("Volume:" + volume.ToString());
+                    Debug.Log("Pitch:" + pitch.ToString());
+                    */
 
                     //create projectNoteObject where note is projected onto trackPlane
                     GameObject ProjectedNoteInstance = Instantiate(ProjectedNote);
@@ -227,14 +238,18 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                     NoteLine.SetPosition(0, noteTrackPosition);
                     NoteLine.SetPosition(1, ProjectedNoteVector);
 
-                    NoteList.Add(new global::Note(Note, noteTrackTimestamp, 1, volume));
+                    NoteList.Add(new global::Note(Note, noteTrackTimestamp, pitch, volume));
 
                     //set infotexts
                     GetChildObject(Note.transform, "TrackTimestampInfoText").GetComponent<TextMesh>().text = noteTrackTimestamp.ToString() + "s";
                     GetChildObject(Note.transform, "TrackVolumeInfoText").GetComponent<TextMesh>().text = volume.ToString();
-
-                    Debug.Log("Note saved");
+                    GetChildObject(Note.transform, "TrackPitchInfoText").GetComponent<TextMesh>().text = pitch.ToString();
                     
+                    //DEBUG
+                    /*
+                    Debug.Log("Note saved");
+                    Debug.Log(NoteList[NoteList.Count-1]);
+                    */
                 }
             }
 
@@ -268,7 +283,7 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
                 }
 
                 //rewind if loop is played
-                if (playTimestamp >= TRACK_DURATION)
+                if (playTimestamp >= TRACK_DURATION && looping)
                 {
                     lastPlayedNoteIndex = -1;
                     playStartTimestamp = Time.time;
@@ -286,7 +301,7 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
         TrackPlane.transform.position = new Vector3(-1, -1, -1);
     }
 
-    private void togglePlaying()
+    public void togglePlaying()
     {
         //if track is displayed
         if (ImageTargetTrackStart.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED && ImageTargetTrackEnd.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED)
@@ -296,15 +311,22 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
 
             if (playing)
             {
+                Debug.Log("Stop Playing");
                 TrackSliderInstance = Instantiate(TrackSlider);
                 TrackSliderInstance.transform.position = ImageTargetTrackStart.transform.position;
                 TrackSliderInstance.transform.rotation = ImageTargetTrackStart.transform.rotation;
             }
             else
             {
+                Debug.Log("Start Playing");
                 Destroy(TrackSliderInstance);
             }
         }
+    }
+
+    public void toggleLooping()
+    {
+        looping = !looping;
     }
 
     //linePnt - point the line passes through
@@ -333,17 +355,6 @@ public class TrackScript : MonoBehaviour, IVirtualButtonEventHandler {
             Color color = vb.GetComponent<MeshRenderer>().material.color;
             vb.GetComponent<MeshRenderer>().material.color = new Color(color.r, color.g, color.b, transparency);
         }
-    }
-
-    public void OnButtonPressed(VirtualButtonBehaviour vb)
-    {
-        SetButtonMaterial(0.5f, vb);
-    }
-
-    public void OnButtonReleased(VirtualButtonBehaviour vb)
-    {
-        togglePlaying();
-        SetButtonMaterial(1f, vb);
     }
 
     private GameObject GetChildObject(Transform parent, string _tag)

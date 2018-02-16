@@ -100,6 +100,7 @@
      <Compile Include="Assets\Scripts\OptionButtonScript.cs" />
      <Compile Include="Assets\Scripts\RecorderScript.cs" />
      <Compile Include="Assets\Scripts\Test.cs" />
+     <Compile Include="Assets\Scripts\TrackButtonEventHandler.cs" />
      <Compile Include="Assets\Scripts\TrackScript.cs" />
      <Compile Include="Assets\Scripts\TrackTargetTrackableEventHandler.cs" />
      <Compile Include="Assets\Scripts\UIController.cs" />
