@@ -8,6 +8,7 @@ public class TrackScript : MonoBehaviour {
 
     public GameObject TrackSlider;
     public GameObject ProjectedNote;
+    public float BPM = 30;
 
     private GameObject TrackSliderInstance;
     private List<GameObject> ProjectedNoteInstances = new List<GameObject>();
@@ -24,7 +25,8 @@ public class TrackScript : MonoBehaviour {
     private const float VOLUME_DISTANCE = 0.2f;         //distance of note from main track line for full volume
     private bool playing = false;
     private float playStartTimestamp;
-    private bool looping;
+    private bool looping = false;
+    private bool metronome = true;
 
     // Use this for initialization
     void Start () {
@@ -70,10 +72,13 @@ public class TrackScript : MonoBehaviour {
 
         ProjectedNoteInstances.Clear();
 
+        //clear notelist
+        NoteList.Clear();
+
         MainTrackLine.SetVertexCount(0);
 
         //if start and end marker are tracked
-        if (ImageTargetTrackStart.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED && ImageTargetTrackEnd.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED)
+        if (trackDetected())
         {
             MainTrackLine.SetVertexCount(2);
             MainTrackLine.SetPosition(0, ImageTargetTrackStart.transform.position);
@@ -132,34 +137,12 @@ public class TrackScript : MonoBehaviour {
 
                 if (Note.GetComponent<TrackableBehaviour>().CurrentStatus == TrackableBehaviour.Status.TRACKED)
                 {
-                    /*
-                    Note.transform.rotation = Quaternion.FromToRotation(ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position);
-                    Note.transform.Translate(0, trackSurfaceVector.y, 0);
-                    
-                    */
-
-
-                    //Vector3 PlaneNormal = GetNormal(ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position, Note.transform.position);
-                    //Note.transform.position = Vector3.ProjectOnPlane(Note.transform.position, PlaneNormal);
-
                     //center note position
                     Note.transform.position = GetChildObject(Note.transform, "NoteCenter").transform.position;
-
-                    //get Normal of plane
-                    //Vector3 PlaneNormal = Vector3.Cross(GetChildObject(ImageTargetTrackStart.transform, "Normal").transform.position - ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position - ImageTargetTrackStart.transform.position);
-
-                    //project note onto plane
-                    /*Vector3 v = Note.transform.position - trackSurfaceVector;
-                    Vector3 d = Vector3.Project(v, PlaneNormal);
-                    Vector3 ProjectedNoteVector = Note.transform.position - d;
-                    */
 
                     Vector3 ProjectedNoteVector = new Vector3(0, 0, 0);
 
                     ProjectedNoteVector = GetClosestPointOnSurface(Note.transform.position, ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position, TrackMeshPoint);
-
-                    //align note rotation to plane rotation
-                    //Note.transform.rotation = ImageTargetTrackStart.transform.rotation;
 
                     //get orthogonal angle from trackVector to note
                     Vector3 noteTrackPosition = NearestPointOnLine(ImageTargetTrackStart.transform.position, (ImageTargetTrackStart.transform.position - ImageTargetTrackEnd.transform.position).normalized, ProjectedNoteVector);
@@ -167,7 +150,7 @@ public class TrackScript : MonoBehaviour {
                     /*
                      * create note obj
                      * 1. Get Distance noteTrackPosition to trackStartPosition
-                     * 2. Calculate timestamp from that Distance
+                     * 2. Calculate timestamp from that Distance (OPTIONAL: align note to closest beat)
                      * 3. Get Distance From Projected Note to TrackLine, Compute Volume From that Distance
                      * 4. Project Note Rotation on TrackPlane, save Y-Rotatation as Pitch
                      */
@@ -179,15 +162,6 @@ public class TrackScript : MonoBehaviour {
 
                     //DEBUG
                     /*
-                    Debug.Log("Note Position:");
-                    Debug.Log(Note.transform.position);
-                    Debug.Log("Projected Note:");
-                    Debug.Log(ProjectedNoteVector);
-                    Debug.Log("Track Position:");
-                    Debug.Log(noteTrackPosition);
-                    Debug.Log("Track Length: " + trackLength.ToString());
-                    Debug.Log("Note Distance Start: " + noteTrackDistanceStart.ToString());
-                    Debug.Log("Note Distance End: " + noteTrackDistanceEnd.ToString());
                     */
 
                     //2
@@ -200,6 +174,15 @@ public class TrackScript : MonoBehaviour {
                         Debug.Log("Note is not on Trackline, skipping");
                         continue;
                     }
+                    
+                    //align note according to metronome
+                    if (metronome)
+                    {
+                        ProjectedNoteVector = ProjectNoteToClosestBeat(ProjectedNoteVector, noteTrackPosition, TRACK_DURATION / trackLength * noteTrackDistanceStart);
+                        noteTrackPosition = NearestPointOnLine(ImageTargetTrackStart.transform.position, (ImageTargetTrackStart.transform.position - ImageTargetTrackEnd.transform.position).normalized, ProjectedNoteVector);
+                        noteTrackDistanceStart = Vector3.Distance(ImageTargetTrackStart.transform.position, noteTrackPosition);
+                        noteTrackTimestamp = Mathf.Ceil((TRACK_DURATION / trackLength * noteTrackDistanceStart) * 10) / 10;
+                    }
 
                     //3
                     float volume = Mathf.Ceil((1 / VOLUME_DISTANCE * Vector3.Distance(noteTrackPosition, ProjectedNoteVector)) * 10) / 10;
@@ -210,6 +193,15 @@ public class TrackScript : MonoBehaviour {
 
                     //DEBUG
                     /*
+                    Debug.Log("Note Position:");
+                    Debug.Log(Note.transform.position);
+                   */ Debug.Log("Projected Note:");
+                    Debug.Log(ProjectedNoteVector);
+                    /*Debug.Log("Track Position:");
+                    Debug.Log(noteTrackPosition);
+                   */ Debug.Log("Track Length: " + trackLength.ToString());
+                    /*Debug.Log("Note Distance Start: " + noteTrackDistanceStart.ToString());
+                    Debug.Log("Note Distance End: " + noteTrackDistanceEnd.ToString());
                     Debug.Log("Note Rotation:");
                     Debug.Log(Note.transform.rotation);
                     Debug.Log("Projected Note Rotation:");
@@ -257,15 +249,31 @@ public class TrackScript : MonoBehaviour {
             /*
              * play sounds
              */
+            float playTimestamp = Time.time - playStartTimestamp;
 
-            if (playing)
+            //stop playing if track is over
+            if(playing && playTimestamp >= TRACK_DURATION && !looping)
             {
+                togglePlaying();
+            } 
+            //play normally
+            else if (playing)
+            {
+                //rewind if loop is played
+                if (playTimestamp >= TRACK_DURATION && looping)
+                {
+                    Debug.Log("Looping");
+                    lastPlayedNoteIndex = -1;
+                    playStartTimestamp = Time.time;
+                    playTimestamp = Time.time - playStartTimestamp;
+                }
 
-                float playTimestamp = Time.time - playStartTimestamp;
                 Debug.Log("Play Timestamp: " + playTimestamp.ToString());
                 Debug.Log("Slider Delta:");
+                Debug.Log("Last played Note Index: " + lastPlayedNoteIndex.ToString());
                 Debug.Log(trackLength / TRACK_DURATION * playTimestamp);
                 TrackSliderInstance.transform.position = Vector3.MoveTowards(ImageTargetTrackStart.transform.position, ImageTargetTrackEnd.transform.position, trackLength / TRACK_DURATION * playTimestamp);
+                TrackSliderInstance.transform.rotation = TrackPlane.transform.rotation;
 
                 for (int i = lastPlayedNoteIndex + 1; i < NoteList.Count; i++)
                 {
@@ -273,6 +281,7 @@ public class TrackScript : MonoBehaviour {
                     if (playTimestamp >= NoteList[i].TrackTimestamp)
                     {
                         Debug.Log("Play Note " + NoteList[i].ImageTarget.GetComponent<ImageTargetBehaviour>().name);
+                        Debug.Log("i: "+ i.ToString());
                         AudioSource NoteToPlay = NoteList[i].ImageTarget.GetComponent<AudioSource>();
                         NoteToPlay.volume = NoteList[i].Volume;
                         NoteToPlay.pitch = NoteList[i].Pitch;
@@ -280,13 +289,6 @@ public class TrackScript : MonoBehaviour {
                         lastPlayedNoteIndex = i;
                         break;
                     }
-                }
-
-                //rewind if loop is played
-                if (playTimestamp >= TRACK_DURATION && looping)
-                {
-                    lastPlayedNoteIndex = -1;
-                    playStartTimestamp = Time.time;
                 }
             }
         } else
@@ -304,7 +306,7 @@ public class TrackScript : MonoBehaviour {
     public void togglePlaying()
     {
         //if track is displayed
-        if (ImageTargetTrackStart.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED && ImageTargetTrackEnd.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED)
+        if (trackDetected())
         {
             playing = !playing;
             playStartTimestamp = Time.time;
@@ -313,8 +315,9 @@ public class TrackScript : MonoBehaviour {
             {
                 Debug.Log("Stop Playing");
                 TrackSliderInstance = Instantiate(TrackSlider);
+                lastPlayedNoteIndex = -1;
                 TrackSliderInstance.transform.position = ImageTargetTrackStart.transform.position;
-                TrackSliderInstance.transform.rotation = ImageTargetTrackStart.transform.rotation;
+                TrackSliderInstance.transform.rotation = TrackPlane.transform.rotation;
             }
             else
             {
@@ -324,9 +327,23 @@ public class TrackScript : MonoBehaviour {
         }
     }
 
+    public void toggleMetronome()
+    {
+        //if track is displayed
+        if (trackDetected())
+        {
+            metronome = !metronome;
+        }
+    }
+
     public void toggleLooping()
     {
         looping = !looping;
+    }
+
+    private Boolean trackDetected()
+    {
+        return ImageTargetTrackStart.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED && ImageTargetTrackEnd.GetComponent<TrackTargetTrackableEventHandler>().status == TrackableBehaviour.Status.TRACKED;
     }
 
     //linePnt - point the line passes through
@@ -445,6 +462,41 @@ public class TrackScript : MonoBehaviour {
     {
         Plane plane = new Plane(a, b, c);
         return plane.ClosestPointOnPlane(point);
+    }
+    
+    private Vector3 ProjectNoteToClosestBeat(Vector3 projectedNoteVector, Vector3 noteTrackPosition, float noteTimestamp)
+    {
+        //compute time between beats
+        float beatDelta = 60 / BPM;
+        //Debug.Log("Beat Delta: " + beatDelta.ToString());
+
+        //compute closest Beat to Note
+        float closestBeatTimestamp;
+        Vector3 timestampZeroVector;
+        float distanceToBeat;
+        if (noteTimestamp % beatDelta <= beatDelta / 2)
+        {
+            closestBeatTimestamp = (float) Math.Floor(noteTimestamp / beatDelta) * beatDelta;
+            timestampZeroVector = projectedNoteVector - (noteTrackPosition - ImageTargetTrackStart.transform.position); //projected note with 0 as timestamp
+            distanceToBeat = Vector3.Distance(projectedNoteVector, timestampZeroVector) / noteTimestamp * Math.Abs(noteTimestamp - closestBeatTimestamp); //distance from noteTrackPosition to closest Beat
+        } else
+        {
+            closestBeatTimestamp = (float) Math.Ceiling(noteTimestamp / beatDelta) * beatDelta;
+            timestampZeroVector = projectedNoteVector - (noteTrackPosition - ImageTargetTrackStart.transform.position); //projected note with 0 as timestamp
+            distanceToBeat = -Vector3.Distance(projectedNoteVector, timestampZeroVector) / noteTimestamp * Math.Abs(noteTimestamp - closestBeatTimestamp); //distance from noteTrackPosition to closest Beat
+        }
+
+
+        //compute vector of note corresponding to closest beat
+        /*
+        Debug.Log("Closest Beat Timestamp: " + closestBeatTimestamp.ToString());
+        Debug.Log("Zero timestamp vector: ");
+        Debug.Log(timestampZeroVector);
+        Debug.Log("Note timestamp: " + noteTimestamp.ToString());
+        Debug.Log("Distance to Beat: " + distanceToBeat.ToString());
+        Debug.Log("trackstartdistance: " + Vector3.Distance(projectedNoteVector, timestampZeroVector).ToString());
+        */
+        return Vector3.MoveTowards(projectedNoteVector, timestampZeroVector, distanceToBeat);
     }
 }
 

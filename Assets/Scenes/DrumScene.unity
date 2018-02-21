@@ -950,6 +950,7 @@ GameObject:
   - component: {fileID: 417562949}
   - component: {fileID: 417562948}
   - component: {fileID: 417562947}
+  - component: {fileID: 417562951}
   m_Layer: 0
   m_Name: ImageTargetTrackEnd
   m_TagString: ImageTargetTrackEnd
@@ -1019,6 +1020,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1770992566, guid: bab6fa851cf5a1a4bba3cec5f191cb8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &417562951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 417562946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e9991254cbd5dc468839c4e1d6e5047, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &417562952
@@ -3501,8 +3513,8 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1422568336}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 458.5, y: 146.5, z: 0}
-  m_LocalScale: {x: 0.83647484, y: 0.83647484, z: 0.83647484}
+  m_LocalPosition: {x: 458.5, y: 187.5, z: 0}
+  m_LocalScale: {x: 0.9463128, y: 0.9463128, z: 0.9463128}
   m_Children:
   - {fileID: 1138153187}
   m_Father: {fileID: 1918187002}
@@ -4355,7 +4367,7 @@ Prefab:
     - target: {fileID: 114919437001326358, guid: 02021a5356849e24f99f318b47326817,
         type: 2}
       propertyPath: mSensitivity
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 02021a5356849e24f99f318b47326817, type: 2}
@@ -4555,7 +4567,7 @@ Prefab:
     - target: {fileID: 114777431755342356, guid: e464545e9eac16849b6a3fe45a1f31b8,
         type: 2}
       propertyPath: mSensitivity
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e464545e9eac16849b6a3fe45a1f31b8, type: 2}
@@ -5871,6 +5883,7 @@ MonoBehaviour:
   TrackSlider: {fileID: 100002, guid: 08a724876349ee046aa010abe1973483, type: 3}
   ProjectedNote: {fileID: 1749212998074394, guid: cca258c1f0d4ff04ebc47234a751af69,
     type: 2}
+  BPM: 120
 --- !u!33 &2089535369
 MeshFilter:
   m_ObjectHideFlags: 0
